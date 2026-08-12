@@ -1,0 +1,194 @@
+@if (prestamo(); as p) {
+  <a
+    routerLink="/pagos"
+    class="tw:mb-4 tw:inline-flex tw:items-center tw:gap-1.5 tw:text-sm tw:text-gray-500"
+  >
+    <i class="pi pi-arrow-left tw:text-xs"></i>
+    Volver a pagos
+  </a>
+
+  <div class="tw:mb-6 tw:flex tw:flex-wrap tw:items-start tw:justify-between tw:gap-3">
+    <div>
+      <h1 class="tw:text-2xl tw:font-bold tw:text-gray-800">
+        Pagos del prestamo #{{ p.prestamoId }}
+      </h1>
+      <p class="tw:text-sm tw:text-gray-500">{{ p.clienteId | clienteLabel: clientes() }}</p>
+    </div>
+    <div class="tw:flex tw:items-center tw:gap-2">
+      <p-tag
+        [value]="p.estadoDesc"
+        [severity]="p.estadoDesc === 'APROBADO' ? 'success' : 'warn'"
+        [rounded]="true"
+      />
+      <p-button
+        label="Ver prestamo"
+        icon="pi pi-file"
+        severity="secondary"
+        [outlined]="true"
+        size="small"
+        [routerLink]="['/prestamos', p.prestamoId]"
+      />
+      <p-button
+        label="Descargar PDF"
+        icon="pi pi-file-pdf"
+        severity="secondary"
+        [outlined]="true"
+        size="small"
+        (onClick)="descargarEstadoPdf()"
+      />
+    </div>
+  </div>
+
+  <c-card class="tw:mb-6 tw:p-6">
+    <div class="tw:mb-3 tw:flex tw:flex-wrap tw:items-end tw:justify-between tw:gap-3">
+      <div>
+        <h2 class="tw:text-base tw:font-semibold tw:text-gray-800">Progreso de pago</h2>
+        <p class="tw:text-sm tw:text-gray-500">
+          {{ cuotasPagadas() }} de {{ cuotas().length }} cuotas pagadas
+        </p>
+      </div>
+      <div class="tw:text-right">
+        <div class="tw:text-sm tw:text-gray-500">Pagado</div>
+        <div class="tw:text-lg tw:font-bold tw:text-gray-800">
+          {{ montoPagado() | number: '1.2-2' }}
+        </div>
+      </div>
+    </div>
+    <p-progressBar [value]="progreso()" [showValue]="false" />
+    <div class="tw:mt-2 tw:flex tw:justify-between tw:text-xs tw:text-gray-500">
+      <span>{{ progreso() }}% completado</span>
+      <span>Pendiente: {{ montoPendiente() | number: '1.2-2' }}</span>
+    </div>
+  </c-card>
+
+  @if (p.estadoDesc !== 'APROBADO') {
+    <c-card class="tw:mb-6 tw:p-6 tw:text-gray-600">
+      Este prestamo aun no esta aprobado. Debe aprobarse antes de poder registrar pagos.
+    </c-card>
+  } @else {
+    @if (cuotaPendiente(); as cuota) {
+      <c-card
+        class="tw:mb-6 tw:p-6"
+        style="
+          box-shadow:
+            0 0 0 1.5px #4f46e5,
+            0 4px 12px rgba(0, 0, 0, 0.06);
+        "
+      >
+        <div class="tw:flex tw:flex-wrap tw:items-center tw:justify-between tw:gap-4">
+          <div>
+            <span class="tw:text-xs tw:font-medium tw:tracking-wide tw:text-gray-500 tw:uppercase"
+              >Siguiente pago</span
+            >
+            <div class="tw:mt-1 tw:text-2xl tw:font-bold" style="color: #4f46e5">
+              {{ cuota.monto | number: '1.2-2' }}
+            </div>
+            <p class="tw:mt-1 tw:text-sm tw:text-gray-500">
+              Cuota #{{ cuota.numeroCuota }} - Vence {{ cuota.fechaVencimiento }}
+            </p>
+          </div>
+
+          <form
+            [formGroup]="form"
+            (ngSubmit)="registrarPago()"
+            class="tw:flex tw:items-end tw:gap-3"
+          >
+            <div class="tw:flex tw:flex-col tw:gap-1">
+              <label for="metodoPago" class="tw:text-sm tw:font-medium tw:text-gray-700">
+                Metodo de pago
+              </label>
+              <p-select
+                inputId="metodoPago"
+                formControlName="metodoPago"
+                [options]="metodoPagoOptions"
+                optionLabel="label"
+                optionValue="value"
+                placeholder="Selecciona"
+                styleClass="tw:w-48"
+              />
+            </div>
+            <p-button
+              label="Registrar pago"
+              type="submit"
+              [loading]="pagando()"
+              [disabled]="form.invalid"
+            />
+          </form>
+        </div>
+      </c-card>
+    } @else {
+      <c-card class="tw:mb-6 tw:p-6 tw:text-gray-600">
+        <i class="pi pi-check-circle tw:mr-2" style="color: #16a34a"></i>
+        Este prestamo no tiene cuotas pendientes de pago.
+      </c-card>
+    }
+  }
+
+  <c-card class="tw:mb-6 tw:p-6">
+    <h2 class="tw:mb-4 tw:text-base tw:font-semibold tw:text-gray-800">Cuotas</h2>
+    <p-table [value]="cuotas()" [loading]="loading()" dataKey="cuotaId" responsiveLayout="scroll">
+      <ng-template pTemplate="header">
+        <tr>
+          <th>Cuota</th>
+          <th>Vencimiento</th>
+          <th>Capital</th>
+          <th>Interes</th>
+          <th>Monto</th>
+          <th>Saldo</th>
+          <th>Estado</th>
+        </tr>
+      </ng-template>
+      <ng-template pTemplate="body" let-cuota>
+        <tr>
+          <td>{{ cuota.numeroCuota }}</td>
+          <td>{{ cuota.fechaVencimiento }}</td>
+          <td>{{ cuota.capital | number: '1.2-2' }}</td>
+          <td>{{ cuota.interes | number: '1.2-2' }}</td>
+          <td>{{ cuota.monto | number: '1.2-2' }}</td>
+          <td>{{ cuota.saldo | number: '1.2-2' }}</td>
+          <td>
+            <p-tag
+              [value]="cuota.estadoDesc"
+              [severity]="cuota.estadoDesc === 'PAGADO' ? 'success' : 'warn'"
+              [rounded]="true"
+            />
+          </td>
+        </tr>
+      </ng-template>
+      <ng-template pTemplate="emptymessage">
+        <tr>
+          <td colspan="7" class="tw:text-center tw:text-gray-500">
+            Aun no hay cuotas generadas para este prestamo.
+          </td>
+        </tr>
+      </ng-template>
+    </p-table>
+  </c-card>
+
+  <c-card class="tw:p-6">
+    <h2 class="tw:mb-4 tw:text-base tw:font-semibold tw:text-gray-800">Historial de pagos</h2>
+    <p-table [value]="historial()" dataKey="pagoId" responsiveLayout="scroll">
+      <ng-template pTemplate="header">
+        <tr>
+          <th>Cuota</th>
+          <th>Fecha de pago</th>
+          <th>Monto pagado</th>
+          <th>Metodo de pago</th>
+        </tr>
+      </ng-template>
+      <ng-template pTemplate="body" let-pago>
+        <tr>
+          <td>#{{ pago.numeroCuota }}</td>
+          <td>{{ pago.fechaPago }}</td>
+          <td>{{ pago.montoPagado | number: '1.2-2' }}</td>
+          <td>{{ pago.metodoPago }}</td>
+        </tr>
+      </ng-template>
+      <ng-template pTemplate="emptymessage">
+        <tr>
+          <td colspan="4" class="tw:text-center tw:text-gray-500">Aun no hay pagos registrados.</td>
+        </tr>
+      </ng-template>
+    </p-table>
+  </c-card>
+}

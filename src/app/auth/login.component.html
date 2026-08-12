@@ -1,0 +1,51 @@
+<div class="tw:flex tw:min-h-screen tw:items-center tw:justify-center tw:bg-gray-50 tw:p-4">
+  <div class="tw:w-full tw:max-w-sm tw:rounded-2xl tw:bg-white tw:p-8 tw:shadow-lg">
+    <div class="tw:mb-6 tw:flex tw:flex-col tw:items-center tw:gap-3">
+      <div
+        class="bg-primary rounded-circle d-flex justify-content-center align-items-center"
+        style="width: 56px; height: 56px"
+      >
+        <svg cIcon name="cilBank" class="text-white"></svg>
+      </div>
+      <div class="tw:text-center">
+        <h1 class="tw:text-xl tw:font-bold tw:text-gray-800">PrestaYa</h1>
+        <p class="tw:text-sm tw:text-gray-500">Sistema de Prestamos</p>
+      </div>
+    </div>
+
+    <form [formGroup]="form" (ngSubmit)="submit()" class="tw:flex tw:flex-col tw:gap-4">
+      <div class="tw:flex tw:flex-col tw:gap-1">
+        <label for="correo" class="tw:text-sm tw:font-medium tw:text-gray-700">Correo</label>
+        <input
+          id="correo"
+          type="email"
+          pInputText
+          formControlName="correo"
+          autocomplete="username"
+          class="tw:w-full"
+        />
+      </div>
+
+      <div class="tw:flex tw:flex-col tw:gap-1">
+        <label for="password" class="tw:text-sm tw:font-medium tw:text-gray-700">Contrasena</label>
+        <p-password
+          inputId="password"
+          formControlName="password"
+          [feedback]="false"
+          [toggleMask]="true"
+          autocomplete="current-password"
+          styleClass="tw:w-full"
+          inputStyleClass="tw:w-full"
+        />
+      </div>
+
+      <p-button
+        type="submit"
+        label="Iniciar sesion"
+        [loading]="loading()"
+        [disabled]="form.invalid"
+        styleClass="tw:mt-2 tw:w-full"
+      />
+    </form>
+  </div>
+</div>

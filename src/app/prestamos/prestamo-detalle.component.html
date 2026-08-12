@@ -1,0 +1,135 @@
+@if (prestamo(); as p) {
+  <a
+    routerLink="/prestamos"
+    class="tw:mb-4 tw:inline-flex tw:items-center tw:gap-1.5 tw:text-sm tw:text-gray-500"
+  >
+    <i class="pi pi-arrow-left tw:text-xs"></i>
+    Volver a prestamos
+  </a>
+
+  <div class="tw:mb-6 tw:flex tw:flex-wrap tw:items-start tw:justify-between tw:gap-3">
+    <div>
+      <h1 class="tw:text-2xl tw:font-bold tw:text-gray-800">Prestamo #{{ p.prestamoId }}</h1>
+      <p class="tw:text-sm tw:text-gray-500">{{ p.clienteId | clienteLabel: clientes() }}</p>
+    </div>
+    <div class="tw:flex tw:items-center tw:gap-2">
+      <p-tag
+        [value]="p.estadoDesc"
+        [severity]="p.estadoDesc === 'APROBADO' ? 'success' : 'warn'"
+        [rounded]="true"
+      />
+      <p-button
+        label="Ver pagos"
+        icon="pi pi-wallet"
+        severity="secondary"
+        [outlined]="true"
+        size="small"
+        (onClick)="verPagos()"
+      />
+      <p-button
+        label="Descargar PDF"
+        icon="pi pi-file-pdf"
+        severity="secondary"
+        [outlined]="true"
+        size="small"
+        (onClick)="descargarPdf()"
+      />
+    </div>
+  </div>
+
+  <div class="tw:mb-6 tw:grid tw:grid-cols-2 tw:gap-4 tw:sm:grid-cols-4">
+    <c-card class="tw:p-5">
+      <span class="tw:text-sm tw:text-gray-500">Monto</span>
+      <div class="tw:mt-2 tw:text-xl tw:font-bold tw:text-gray-800">
+        {{ p.monto | number: '1.2-2' }}
+      </div>
+    </c-card>
+    <c-card class="tw:p-5">
+      <span class="tw:text-sm tw:text-gray-500">Cuota mensual</span>
+      <div class="tw:mt-2 tw:text-xl tw:font-bold tw:text-gray-800">
+        {{ p.cuotaMensual | number: '1.2-2' }}
+      </div>
+    </c-card>
+    <c-card class="tw:p-5">
+      <span class="tw:text-sm tw:text-gray-500">Total interes</span>
+      <div class="tw:mt-2 tw:text-xl tw:font-bold tw:text-gray-800">
+        {{ p.totalInteres | number: '1.2-2' }}
+      </div>
+    </c-card>
+    <c-card
+      class="tw:p-5"
+      style="
+        box-shadow:
+          0 0 0 1.5px #4f46e5,
+          0 4px 12px rgba(0, 0, 0, 0.06);
+      "
+    >
+      <span class="tw:text-sm tw:text-gray-500">Total a pagar</span>
+      <div class="tw:mt-2 tw:text-xl tw:font-bold" style="color: #4f46e5">
+        {{ p.totalPagar | number: '1.2-2' }}
+      </div>
+    </c-card>
+  </div>
+
+  <c-card class="tw:mb-6 tw:p-6">
+    <h2 class="tw:mb-4 tw:text-base tw:font-semibold tw:text-gray-800">Condiciones del prestamo</h2>
+    <dl class="tw:grid tw:grid-cols-2 tw:gap-x-8 tw:gap-y-4 tw:text-sm tw:sm:grid-cols-3">
+      <div>
+        <dt class="tw:text-gray-500">Tasa anual</dt>
+        <dd class="tw:mt-1 tw:font-medium tw:text-gray-800">
+          {{ p.tasaInteres | number: '1.2-2' }}%
+        </dd>
+      </div>
+      <div>
+        <dt class="tw:text-gray-500">Plazo</dt>
+        <dd class="tw:mt-1 tw:font-medium tw:text-gray-800">{{ p.plazoMeses }} meses</dd>
+      </div>
+      <div>
+        <dt class="tw:text-gray-500">Fecha aprobacion</dt>
+        <dd class="tw:mt-1 tw:font-medium tw:text-gray-800">{{ p.fechaAprobacion ?? '-' }}</dd>
+      </div>
+    </dl>
+
+    @if (p.estadoDesc === 'PENDIENTE') {
+      <div class="tw:mt-6 tw:border-t tw:border-gray-100 tw:pt-5">
+        <p-button
+          label="Aprobar prestamo"
+          icon="pi pi-check"
+          [loading]="aprobando()"
+          (onClick)="aprobar()"
+        />
+      </div>
+    }
+  </c-card>
+
+  <c-card class="tw:p-6">
+    <div class="tw:mb-4">
+      <h2 class="tw:text-base tw:font-semibold tw:text-gray-800">Cronograma proyectado</h2>
+      <p class="tw:text-sm tw:text-gray-500">
+        Calculado con el sistema frances (cuota fija) al registrar el prestamo.
+      </p>
+    </div>
+    <p-table [value]="p.cronograma" dataKey="numeroCuota" responsiveLayout="scroll">
+      <ng-template pTemplate="header">
+        <tr>
+          <th>Cuota</th>
+          <th>Fecha de pago</th>
+          <th>Capital</th>
+          <th>Interes</th>
+          <th>Cuota</th>
+          <th>Saldo</th>
+        </tr>
+      </ng-template>
+      <ng-template pTemplate="body" let-detalle>
+        <tr>
+          <td>{{ detalle.numeroCuota }}</td>
+          <td>{{ detalle.fechaPago }}</td>
+          <td>{{ detalle.capital | number: '1.2-2' }}</td>
+          <td>{{ detalle.interes | number: '1.2-2' }}</td>
+          <td>{{ detalle.cuota | number: '1.2-2' }}</td>
+          <td>{{ detalle.saldo | number: '1.2-2' }}</td>
+        </tr>
+      </ng-template>
+    </p-table>
+  </c-card>
+}

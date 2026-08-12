@@ -1,12 +1,20 @@
-import { Component, signal } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
+import { IconSetService } from '@coreui/icons-angular';
+import { Toast } from 'primeng/toast';
+
+import { iconSubset } from './layout/icon-subset';
 
 @Component({
   selector: 'app-root',
-  imports: [RouterOutlet],
+  imports: [RouterOutlet, Toast],
   templateUrl: './app.html',
-  styleUrl: './app.css'
+  styleUrl: './app.css',
 })
 export class App {
-  protected readonly title = signal('prestamos-web');
+  private readonly iconSetService = inject(IconSetService);
+
+  constructor() {
+    this.iconSetService.icons = { ...iconSubset };
+  }
 }

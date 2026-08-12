@@ -1,0 +1,55 @@
+<c-sidebar id="sidebar" colorScheme="dark" [visible]="true" [unfoldable]="true">
+  <c-sidebar-header class="border-bottom py-3">
+    <c-sidebar-brand class="d-flex align-items-center gap-3">
+      <div
+        class="bg-primary rounded-circle d-flex justify-content-center align-items-center flex-shrink-0"
+        style="width: 40px; height: 40px"
+      >
+        <svg cIcon name="cilBank" class="text-white"></svg>
+      </div>
+
+      <div class="sidebar-brand-full">
+        <div class="fw-bold fs-5">PrestaYa</div>
+        <small class="text-body-secondary">Sistema de Préstamos</small>
+      </div>
+    </c-sidebar-brand>
+  </c-sidebar-header>
+  <c-sidebar-nav [navItems]="navItems" />
+</c-sidebar>
+
+<div class="wrapper tw:flex tw:min-h-screen tw:flex-col">
+  <c-header position="sticky" [cShadowOnScroll]="'sm'">
+    <c-container fluid>
+      <button cHeaderToggler cSidebarToggle="sidebar" class="tw:me-2 tw:border-0 tw:bg-transparent">
+        <svg cIcon name="cilMenu" size="lg"></svg>
+      </button>
+
+      <c-header-nav class="tw:ms-auto">
+        <c-dropdown alignment="end">
+          <button
+            cDropdownToggle
+            class="tw:flex tw:items-center tw:gap-2 tw:border-0 tw:bg-transparent tw:p-0"
+          >
+            <c-avatar color="primary" textColor="white" size="md">{{ userInitial() }}</c-avatar>
+          </button>
+          <div cDropdownMenu>
+            <div class="tw:px-3 tw:py-2 tw:text-sm">
+              <div class="tw:font-medium tw:text-gray-800">{{ auth.usuario()?.nombre }}</div>
+              <div class="tw:text-xs tw:text-gray-500">{{ auth.usuario()?.rol }}</div>
+            </div>
+            <a cDropdownItem role="button" (click)="logout()">
+              <svg cIcon name="cilAccountLogout" size="sm" class="tw:me-2"></svg>
+              Cerrar sesion
+            </a>
+          </div>
+        </c-dropdown>
+      </c-header-nav>
+    </c-container>
+  </c-header>
+
+  <c-breadcrumb-router class="tw:px-6 tw:py-3" />
+
+  <div class="body tw:flex-grow tw:px-6 tw:pb-8">
+    <router-outlet />
+  </div>
+</div>

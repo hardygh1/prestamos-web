@@ -1,0 +1,83 @@
+<div class="tw:mb-5 tw:flex tw:flex-wrap tw:items-center tw:justify-between tw:gap-3">
+  <div>
+    <h1 class="tw:text-2xl tw:font-bold tw:text-gray-800">Pagos</h1>
+    <p class="tw:text-sm tw:text-gray-500">Selecciona un prestamo para gestionar sus pagos.</p>
+  </div>
+  <span
+    class="tw:flex tw:items-center tw:gap-1.5 tw:rounded-full tw:bg-teal-50 tw:px-3 tw:py-1.5 tw:text-xs tw:font-medium tw:text-teal-700"
+  >
+    <span class="tw:h-1.5 tw:w-1.5 tw:rounded-full tw:bg-teal-500"></span>
+    {{ prestamos().length }} prestamos
+  </span>
+</div>
+
+<c-card class="tw:p-6">
+  <p-iconfield class="tw:mb-4 tw:block tw:max-w-sm">
+    <p-inputicon class="pi pi-search" />
+    <input
+      type="text"
+      pInputText
+      [ngModel]="filtro()"
+      (ngModelChange)="filtro.set($event)"
+      placeholder="Buscar por cliente o estado..."
+      class="tw:w-full"
+    />
+  </p-iconfield>
+
+  <p-table
+    [value]="prestamosFiltrados()"
+    [loading]="loading()"
+    [paginator]="true"
+    [rows]="10"
+    dataKey="prestamoId"
+    responsiveLayout="scroll"
+  >
+    <ng-template pTemplate="header">
+      <tr>
+        <th>Cliente</th>
+        <th>Monto</th>
+        <th>Cuota mensual</th>
+        <th>Estado</th>
+        <th></th>
+      </tr>
+    </ng-template>
+    <ng-template pTemplate="body" let-prestamo>
+      <tr>
+        <td>
+          <div class="tw:flex tw:items-center tw:gap-2">
+            <div
+              class="tw:flex tw:h-8 tw:w-8 tw:shrink-0 tw:items-center tw:justify-center tw:rounded-full tw:bg-teal-100 tw:text-xs tw:font-semibold tw:text-teal-700"
+            >
+              {{ inicialesCliente(prestamo.clienteId) }}
+            </div>
+            <span class="tw:font-medium tw:text-gray-800">{{
+              prestamo.clienteId | clienteLabel: clientes()
+            }}</span>
+          </div>
+        </td>
+        <td>{{ prestamo.monto | number: '1.2-2' }}</td>
+        <td>{{ prestamo.cuotaMensual | number: '1.2-2' }}</td>
+        <td>
+          <p-tag
+            [value]="prestamo.estadoDesc"
+            [severity]="prestamo.estadoDesc === 'APROBADO' ? 'success' : 'warn'"
+            [rounded]="true"
+          />
+        </td>
+        <td>
+          <p-button
+            label="Gestionar pagos"
+            [text]="true"
+            size="small"
+            (onClick)="gestionarPagos(prestamo.prestamoId)"
+          />
+        </td>
+      </tr>
+    </ng-template>
+    <ng-template pTemplate="emptymessage">
+      <tr>
+        <td colspan="5" class="tw:text-center tw:text-gray-500">No hay prestamos registrados.</td>
+      </tr>
+    </ng-template>
+  </p-table>
+</c-card>

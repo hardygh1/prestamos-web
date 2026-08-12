@@ -1,0 +1,195 @@
+<div class="tw:mb-5 tw:flex tw:flex-wrap tw:items-center tw:justify-between tw:gap-3">
+  <div>
+    <h1 class="tw:text-2xl tw:font-bold tw:text-gray-800">Clientes</h1>
+    <p class="tw:text-sm tw:text-gray-500">Administra la informacion de tus clientes.</p>
+  </div>
+  <div class="tw:flex tw:items-center tw:gap-3">
+    <span
+      class="tw:flex tw:items-center tw:gap-1.5 tw:rounded-full tw:bg-green-50 tw:px-3 tw:py-1.5 tw:text-xs tw:font-medium tw:text-green-700"
+    >
+      <span class="tw:h-1.5 tw:w-1.5 tw:rounded-full tw:bg-green-500"></span>
+      {{ totalRecords() }} clientes
+    </span>
+    <p-button label="Nuevo cliente" icon="pi pi-plus" (onClick)="abrirNuevo()" />
+  </div>
+</div>
+
+<c-card class="tw:p-6">
+  <form [formGroup]="filtrosForm" class="tw:mb-4 tw:flex tw:flex-wrap tw:items-end tw:gap-3">
+    <div class="tw:flex tw:flex-col tw:gap-1">
+      <label class="tw:text-sm tw:font-medium tw:text-gray-700">Documento</label>
+      <p-iconfield>
+        <p-inputicon class="pi pi-search" />
+        <input
+          type="text"
+          pInputText
+          formControlName="documento"
+          placeholder="Numero de documento"
+          class="tw:w-48"
+        />
+      </p-iconfield>
+    </div>
+    <div class="tw:flex tw:flex-col tw:gap-1">
+      <label class="tw:text-sm tw:font-medium tw:text-gray-700">Nombre</label>
+      <p-iconfield>
+        <p-inputicon class="pi pi-search" />
+        <input
+          type="text"
+          pInputText
+          formControlName="nombre"
+          placeholder="Nombres o apellidos"
+          class="tw:w-56"
+        />
+      </p-iconfield>
+    </div>
+    <div class="tw:flex tw:flex-col tw:gap-1">
+      <label class="tw:text-sm tw:font-medium tw:text-gray-700">Estado</label>
+      <p-select
+        formControlName="estadoId"
+        [options]="estadoOptions()"
+        optionLabel="label"
+        optionValue="value"
+        placeholder="Todos"
+        [showClear]="true"
+        styleClass="tw:w-40"
+      />
+    </div>
+  </form>
+
+  <p-table
+    [value]="clientes()"
+    [loading]="loading()"
+    [lazy]="true"
+    [paginator]="true"
+    [rows]="10"
+    [first]="tableFirst()"
+    [totalRecords]="totalRecords()"
+    (onLazyLoad)="onLazyLoad($event)"
+    dataKey="clienteId"
+    responsiveLayout="scroll"
+  >
+    <ng-template pTemplate="header">
+      <tr>
+        <th pSortableColumn="nombres">Cliente <p-sortIcon field="nombres" /></th>
+        <th pSortableColumn="numeroDocumento">Documento <p-sortIcon field="numeroDocumento" /></th>
+        <th>Telefono</th>
+        <th>Correo</th>
+        <th>Estado</th>
+        <th pSortableColumn="fechaRegistro">Fecha registro <p-sortIcon field="fechaRegistro" /></th>
+        <th></th>
+      </tr>
+    </ng-template>
+    <ng-template pTemplate="body" let-cliente>
+      <tr>
+        <td>
+          <div class="tw:flex tw:items-center tw:gap-2">
+            <div
+              class="tw:flex tw:h-8 tw:w-8 tw:shrink-0 tw:items-center tw:justify-center tw:rounded-full tw:bg-indigo-100 tw:text-xs tw:font-semibold tw:text-indigo-700"
+            >
+              {{ iniciales(cliente) }}
+            </div>
+            <span class="tw:font-medium tw:text-gray-800"
+              >{{ cliente.nombres }} {{ cliente.apellidos }}</span
+            >
+          </div>
+        </td>
+        <td>{{ cliente.tipoDocumentoDesc }} {{ cliente.numeroDocumento }}</td>
+        <td>{{ cliente.telefono ?? '-' }}</td>
+        <td>{{ cliente.correo ?? '-' }}</td>
+        <td>
+          <p-select
+            [options]="estadoOptions()"
+            optionLabel="label"
+            optionValue="value"
+            [ngModel]="cliente.estadoId"
+            (onChange)="cambiarEstado(cliente, $event.value)"
+            styleClass="tw:w-36"
+          />
+        </td>
+        <td>{{ cliente.fechaRegistro | date: 'dd/MM/yyyy HH:mm' }}</td>
+        <td>
+          <p-button label="Editar" [text]="true" size="small" (onClick)="abrirEditar(cliente)" />
+        </td>
+      </tr>
+    </ng-template>
+    <ng-template pTemplate="emptymessage">
+      <tr>
+        <td colspan="7" class="tw:text-center tw:text-gray-500">No hay clientes registrados.</td>
+      </tr>
+    </ng-template>
+  </p-table>
+</c-card>
+
+<p-dialog
+  [header]="editingId() ? 'Editar cliente' : 'Nuevo cliente'"
+  [visible]="dialogVisible()"
+  (visibleChange)="dialogVisible.set($event)"
+  [modal]="true"
+  [style]="{ width: '28rem' }"
+>
+  <form [formGroup]="form" (ngSubmit)="guardar()" class="tw:flex tw:flex-col tw:gap-3">
+    <div class="tw:flex tw:flex-col tw:gap-1">
+      <label for="tipoDocumentoId" class="tw:text-sm tw:font-medium tw:text-gray-700">
+        Tipo de documento *
+      </label>
+      <p-select
+        inputId="tipoDocumentoId"
+        formControlName="tipoDocumentoId"
+        [options]="tipoDocumentoOptions()"
+        optionLabel="label"
+        optionValue="value"
+        placeholder="Selecciona"
+        styleClass="tw:w-full"
+      />
+    </div>
+
+    <div class="tw:flex tw:flex-col tw:gap-1">
+      <label for="numeroDocumento" class="tw:text-sm tw:font-medium tw:text-gray-700">
+        Numero de documento *
+      </label>
+      <input
+        id="numeroDocumento"
+        type="text"
+        pInputText
+        formControlName="numeroDocumento"
+        class="tw:w-full"
+      />
+    </div>
+
+    <div class="tw:flex tw:flex-col tw:gap-1">
+      <label for="nombres" class="tw:text-sm tw:font-medium tw:text-gray-700">Nombres *</label>
+      <input id="nombres" type="text" pInputText formControlName="nombres" class="tw:w-full" />
+    </div>
+
+    <div class="tw:flex tw:flex-col tw:gap-1">
+      <label for="apellidos" class="tw:text-sm tw:font-medium tw:text-gray-700">Apellidos *</label>
+      <input id="apellidos" type="text" pInputText formControlName="apellidos" class="tw:w-full" />
+    </div>
+
+    <div class="tw:flex tw:flex-col tw:gap-1">
+      <label for="telefono" class="tw:text-sm tw:font-medium tw:text-gray-700">Telefono</label>
+      <input id="telefono" type="text" pInputText formControlName="telefono" class="tw:w-full" />
+    </div>
+
+    <div class="tw:flex tw:flex-col tw:gap-1">
+      <label for="direccion" class="tw:text-sm tw:font-medium tw:text-gray-700">Direccion</label>
+      <input id="direccion" type="text" pInputText formControlName="direccion" class="tw:w-full" />
+    </div>
+
+    <div class="tw:flex tw:flex-col tw:gap-1">
+      <label for="correo" class="tw:text-sm tw:font-medium tw:text-gray-700">Correo</label>
+      <input id="correo" type="email" pInputText formControlName="correo" class="tw:w-full" />
+    </div>
+
+    <div class="tw:mt-2 tw:flex tw:justify-end tw:gap-2">
+      <p-button
+        label="Cancelar"
+        severity="secondary"
+        [text]="true"
+        type="button"
+        (onClick)="dialogVisible.set(false)"
+      />
+      <p-button label="Guardar" type="submit" [loading]="saving()" [disabled]="form.invalid" />
+    </div>
+  </form>
+</p-dialog>

@@ -1,0 +1,92 @@
+<div class="tw:mb-5">
+  <h1 class="tw:text-2xl tw:font-bold tw:text-gray-800">
+    Bienvenido, {{ auth.usuario()?.nombre }}
+  </h1>
+  <p class="tw:text-sm tw:text-gray-500">Resumen general del sistema de creditos.</p>
+</div>
+
+<div class="tw:grid tw:grid-cols-1 tw:gap-4 tw:sm:grid-cols-2 tw:lg:grid-cols-3">
+  <c-card class="tw:p-5">
+    <div class="tw:flex tw:items-start tw:justify-between">
+      <span class="tw:text-sm tw:text-gray-500">Clientes registrados</span>
+      <div
+        class="tw:flex tw:h-10 tw:w-10 tw:items-center tw:justify-center tw:rounded-xl"
+        style="background-color: #eef2ff"
+      >
+        <i class="pi pi-users" style="color: #4f46e5"></i>
+      </div>
+    </div>
+    <div class="tw:mt-3 tw:text-2xl tw:font-bold tw:text-gray-800">{{ totalClientes() }}</div>
+  </c-card>
+
+  <c-card class="tw:p-5">
+    <div class="tw:flex tw:items-start tw:justify-between">
+      <span class="tw:text-sm tw:text-gray-500">Prestamos totales</span>
+      <div
+        class="tw:flex tw:h-10 tw:w-10 tw:items-center tw:justify-center tw:rounded-xl"
+        style="background-color: #f5f3ff"
+      >
+        <i class="pi pi-file" style="color: #7c3aed"></i>
+      </div>
+    </div>
+    <div class="tw:mt-3 tw:text-2xl tw:font-bold tw:text-gray-800">{{ totalPrestamos() }}</div>
+  </c-card>
+
+  <c-card class="tw:p-5">
+    <div class="tw:flex tw:items-start tw:justify-between">
+      <span class="tw:text-sm tw:text-gray-500">Pendientes de aprobacion</span>
+      <div
+        class="tw:flex tw:h-10 tw:w-10 tw:items-center tw:justify-center tw:rounded-xl"
+        style="background-color: #fff7ed"
+      >
+        <i class="pi pi-clock" style="color: #f97316"></i>
+      </div>
+    </div>
+    <div class="tw:mt-3 tw:text-2xl tw:font-bold tw:text-gray-800">
+      {{ prestamosPendientes() }}
+    </div>
+  </c-card>
+
+  <c-card class="tw:p-5">
+    <div class="tw:flex tw:items-start tw:justify-between">
+      <span class="tw:text-sm tw:text-gray-500">Prestamos aprobados</span>
+      <div
+        class="tw:flex tw:h-10 tw:w-10 tw:items-center tw:justify-center tw:rounded-xl"
+        style="background-color: #f0fdf4"
+      >
+        <i class="pi pi-check-circle" style="color: #16a34a"></i>
+      </div>
+    </div>
+    <div class="tw:mt-3 tw:text-2xl tw:font-bold tw:text-gray-800">{{ prestamosAprobados() }}</div>
+  </c-card>
+
+  <c-card class="tw:p-5">
+    <div class="tw:flex tw:items-start tw:justify-between">
+      <span class="tw:text-sm tw:text-gray-500">Monto total prestado</span>
+      <div
+        class="tw:flex tw:h-10 tw:w-10 tw:items-center tw:justify-center tw:rounded-xl"
+        style="background-color: #fdf4ff"
+      >
+        <i class="pi pi-money-bill" style="color: #a855f7"></i>
+      </div>
+    </div>
+    <div class="tw:mt-3 tw:text-2xl tw:font-bold tw:text-gray-800">
+      {{ montoTotalPrestado() | number: '1.2-2' }}
+    </div>
+  </c-card>
+
+  <c-card class="tw:p-5">
+    <div class="tw:flex tw:items-start tw:justify-between">
+      <span class="tw:text-sm tw:text-gray-500">Total a cobrar (aprobados)</span>
+      <div
+        class="tw:flex tw:h-10 tw:w-10 tw:items-center tw:justify-center tw:rounded-xl"
+        style="background-color: #f0fdfa"
+      >
+        <i class="pi pi-wallet" style="color: #14b8a6"></i>
+      </div>
+    </div>
+    <div class="tw:mt-3 tw:text-2xl tw:font-bold tw:text-gray-800">
+      {{ totalPorCobrar() | number: '1.2-2' }}
+    </div>
+  </c-card>
+</div>

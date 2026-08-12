@@ -1,3 +1,37 @@
 /* You can add global styles to this file, and also import other style files */
 
-@import 'tailwindcss';
+/* CoreUI: capa base de layout (sidebar, header, breadcrumb, grid, reset) */
+@import '@coreui/coreui/dist/css/coreui.min.css';
+
+/* PrimeIcons: iconografia usada por los componentes de PrimeNG */
+@import 'primeicons/primeicons.css';
+
+/* Tailwind con prefijo "tw:" para evitar colisiones con las clases utilitarias
+   de CoreUI (ej. mb-3, d-flex) que usan los mismos nombres con otros valores */
+@import 'tailwindcss' prefix(tw);
+
+/* CoreUI expone el ancho ocupado por el sidebar fijo via --cui-sidebar-occupy-start
+   (ver @coreui/coreui/dist/css/coreui.css) para que el contenido lo consuma;
+   el paquete no incluye esta regla porque es especifica del layout de la app */
+.wrapper {
+  margin-inline-start: var(--cui-sidebar-occupy-start, 0);
+  transition: margin-inline-start 0.15s ease;
+}
+
+/* Tarjetas mas suaves (radius + sombra sutil) que el borde plano por defecto de CoreUI */
+:root {
+  --cui-border-radius: 1rem;
+  --cui-card-box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04), 0 4px 12px rgba(0, 0, 0, 0.06);
+
+  /* PrimeNG (Aura) define su tipografia como "inherit" a proposito -- no impone
+     fuente propia, hereda la del host. CoreUI si define una via --cui-font-sans-serif,
+     asi que sobreescribimos esa variable para que ambas librerias usen Inter
+     (la fuente que usan las plantillas oficiales de PrimeNG) en vez de la del sistema. */
+  --cui-font-sans-serif: 'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+}
+
+/* Fondo gris claro para el area de contenido, para que las tarjetas blancas resalten
+   (no se toca --cui-body-bg global porque el fondo de las cards depende de esa variable) */
+.wrapper .body {
+  background-color: #f8f9fc;
+}
